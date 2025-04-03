@@ -1,24 +1,12 @@
-package com.example.student.domain;
+package com.example.student.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
+import lombok.*;
 
-@Entity
-@Table(name = "studentinfo")
 @Getter
 @Setter
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class Student {
-
-    @Id
+@NoArgsConstructor
+@AllArgsConstructor
+public class StudentDto {
     private String id;
     private String fullname;
     private String email;
