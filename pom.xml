@@ -38,7 +38,12 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>8.0.29</version> <!-- përdorni versionin e fundit -->
 		</dependency>
-
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.30</version>
+			<scope>provided</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -109,6 +114,9 @@
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 						</path>
+						<image>
+							<builder>paketobuildpacks/builder-jammy-base:latest</builder>
+						</image>
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>

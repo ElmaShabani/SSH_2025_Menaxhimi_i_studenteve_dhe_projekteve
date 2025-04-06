@@ -1,6 +1,8 @@
 package com.example.student.resource;
 
+
 import com.example.student.domain.Contact;
+import com.example.student.dto.ContactDto;
 import com.example.student.service.ContactService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -12,14 +14,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+
 import static com.example.student.constant.Constant.PHOTO_DIRECTORY;
 import static org.springframework.http.MediaType.IMAGE_JPEG_VALUE;
 import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
+
+
+
 
 
 
@@ -33,10 +40,12 @@ public class ContactResource {
     }
 
     @PostMapping
-    public ResponseEntity<Contact> createContact(@RequestBody Contact contact) {
-        //return ResponseEntity.ok().body(contactService.createContact(contact));
-        return ResponseEntity.created(URI.create("/contacts/userID")).body(contactService.createContact(contact));
+    public ResponseEntity<Contact> createContact(@RequestBody ContactDto contactDto) {
+        return ResponseEntity.created(URI.create("/contacts/userID"))
+                .body(contactService.createContact(contactDto));  // ✅ Nuk ka më probleme
     }
+
+
 
     @GetMapping
     public ResponseEntity<Page<Contact>> getContacts(@RequestParam(value = "page", defaultValue = "0") int page,
@@ -45,8 +54,12 @@ public class ContactResource {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Contact> getContact(@PathVariable(value = "id") String id) {
-        return ResponseEntity.ok().body(contactService.getContact(id));
+    public ResponseEntity<ContactDto> getContact(@PathVariable(value = "id") String id) {
+        Contact contact = contactService.getContact(id);
+
+        ContactDto contactDto = new ContactDto(contact.getName(), contact.getPhone());
+
+        return ResponseEntity.ok().body(contactDto);
     }
 
 //    @PutMapping("/photo")
