@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/students")
@@ -38,5 +39,38 @@ public class StudentController {
             return ResponseEntity.ok().body(student);
         }
         return ResponseEntity.notFound().build();
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String>deleteStudent(@PathVariable String id){
+        boolean deleted=studentService.deleteStudent(id);
+        if(deleted){
+            return ResponseEntity.ok("Student with id"+id+"is deleted successfully");
+        }
+        else{
+            return  ResponseEntity.notFound().build();
+        }
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<Student> updateStudent(@PathVariable String id, @RequestBody Student updatestudent ){
+        Student student= studentService.updateStudent(id,updatestudent);
+        if(student!=null){
+            return ResponseEntity.ok(student);
+        }
+        else{
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping("/filter")
+    public ResponseEntity<List<Student>> filterStudents(
+            @RequestParam(value = "id", required = false) String id,
+            @RequestParam(value = "email", required = false) String email) {
+
+        List<Student> students = studentService.filterStudents(id, email);
+
+        if (!students.isEmpty()) {
+            return ResponseEntity.ok(students);
+        } else {
+            return ResponseEntity.notFound().build(); // Return 404 if no students match the filter
+        }
     }
 }
