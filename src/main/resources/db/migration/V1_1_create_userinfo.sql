@@ -4,3 +4,5 @@ CREATE TABLE userinfo (
   fullname VARCHAR(255) DEFAULT NULL,
   is_admin BIT(1) DEFAULT NULL
 );
+ALTER TABLE userinfo
+ADD password_hash VARCHAR(255) NOT NULL;

@@ -1,32 +1,54 @@
 package com.example.student.service;
 
-import com.example.student.domain.Student;
 import com.example.student.domain.User;
-import com.example.student.repo.StudentRepo;
+import com.example.student.dto.UserDto;
 import com.example.student.repo.UserRepo;
+import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
 
 @Service
+@Data
+@Getter
+@Setter
 @RequestMapping("/users")
 public class UserService {
 
     private final UserRepo userRepository;
+    private final PasswordEncoder passwordEncoder;
+
     @Autowired
-    public UserService(UserRepo userRepository) {
+    public UserService(UserRepo userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
-    public User createUser(User user) {
+    @PostMapping
+    public User createUser(UserDto userDTO) {
+        User user = new User();
+        user.setFullname(userDTO.getFullname());
+        user.setEmail(userDTO.getEmail());
+
+        String hashedPassword = passwordEncoder.encode(userDTO.getPassword());
+        user.setPasswordHash(hashedPassword);
+
         return userRepository.save(user);
     }
+
+
+
     @GetMapping
     public Page<User> getAllUsers(int page, int size) {
         return userRepository.findAll(PageRequest.of(page, size));
@@ -55,12 +77,10 @@ public class UserService {
     }
 
     public List<User> filterUser(String id, String email) {
-        if (id != null && email != null) {
-            return userRepository.findByIdAndEmail(id, email);
-        } else if (id != null) {
+        if (id != null) {
             return userRepository.findById(id).map(List::of).orElse(List.of());
         } else if (email != null) {
-            return userRepository.findByEmail(email).orElse(List.of());
+            return userRepository.findByEmail(email).map(List::of).orElse(List.of());
         } else {
             return userRepository.findAll();
         }

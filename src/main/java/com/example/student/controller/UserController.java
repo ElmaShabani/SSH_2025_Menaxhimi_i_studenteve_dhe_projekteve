@@ -1,8 +1,9 @@
 package com.example.student.controller;
 
 import com.example.student.domain.User;
+import com.example.student.dto.UserDto;
 import com.example.student.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.*;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
+@Data
 @RequestMapping("/users")
 public class UserController {
 
@@ -22,14 +24,14 @@ public class UserController {
 
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<User> createUser(@RequestBody UserDto user) {
         User createdUser = userService.createUser(user);
         return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).body(createdUser);
     }
 
     @GetMapping
     public ResponseEntity<Page<User>> getUser(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                     @RequestParam(value = "size", defaultValue = "10") int size) {
+                                              @RequestParam(value = "size", defaultValue = "10") int size) {
         Page<User> users = userService.getAllUsers(page, size);
         return ResponseEntity.ok().body(users);
     }
@@ -53,15 +55,15 @@ public class UserController {
         }
     }
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser( String id, @RequestBody User updateuser ){
-        User user= userService.updateUser(id,updateuser);
-        if(user!=null){
+    public ResponseEntity<User> updateUser(@PathVariable String id, @RequestBody User updateUser) {
+        User user = userService.updateUser(id, updateUser);
+        if (user != null) {
             return ResponseEntity.ok(user);
-        }
-        else{
+        } else {
             return ResponseEntity.notFound().build();
         }
     }
+
     @GetMapping("/filter")
     public ResponseEntity<List<User>> filterUser(
             @RequestParam(value = "id", required = false) String id,
@@ -76,3 +78,5 @@ public class UserController {
         }
     }
 }
+
+
