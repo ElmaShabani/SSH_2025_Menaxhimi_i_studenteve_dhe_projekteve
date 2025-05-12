@@ -1,6 +1,8 @@
 package com.example.student.service;
 
+import com.example.student.domain.Role;
 import com.example.student.domain.User;
+import com.example.student.dto.PasswordChangeDto;
 import com.example.student.dto.UserDto;
 import com.example.student.repo.UserRepo;
 import lombok.Data;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 
 @Service
@@ -26,7 +30,6 @@ import java.util.List;
 @Setter
 @RequestMapping("/users")
 public class UserService {
-
     private final UserRepo userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -35,55 +38,43 @@ public class UserService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
-    @PostMapping
+
     public User createUser(UserDto userDTO) {
         User user = new User();
+        user.setId(UUID.randomUUID().toString());
         user.setFullname(userDTO.getFullname());
         user.setEmail(userDTO.getEmail());
-
-        String hashedPassword = passwordEncoder.encode(userDTO.getPassword());
-        user.setPasswordHash(hashedPassword);
-
+        user.setRole(userDTO.getRole() != null ? userDTO.getRole() : Role.STUDENT);
+        user.setPasswordHash(passwordEncoder.encode(userDTO.getPassword()));
         return userRepository.save(user);
     }
 
-
-
-    @GetMapping
-    public Page<User> getAllUsers(int page, int size) {
-        return userRepository.findAll(PageRequest.of(page, size));
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
-
-    public User getUserById(String id) {
-        return userRepository.findById(id).orElse(null);
-    }
-
-    public boolean deleteUser(String id) {
-        if (userRepository.existsById(id)) {
-            userRepository.deleteById(id);
-            return true;
+    public boolean changePassword(String userId, PasswordChangeDto dto) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            if (passwordEncoder.matches(dto.getOldPassword(), user.getPasswordHash())) {
+                user.setPasswordHash(passwordEncoder.encode(dto.getNewPassword()));
+                userRepository.save(user);
+                return true;
+            }
         }
         return false;
     }
 
-    public User updateUser(String id, User updatedUser) {
-        return userRepository.findById(id).map(user -> {
-            user.setFullname(updatedUser.getFullname());
-            user.setAdmin(updatedUser.getAdmin());
-            user.setEmail(updatedUser.getEmail());
-            return userRepository.save(user);
-        }).orElse(null);
+    public PasswordEncoder getPasswordEncoder() {
+        return passwordEncoder;
+    }
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
-    public List<User> filterUser(String id, String email) {
-        if (id != null) {
-            return userRepository.findById(id).map(List::of).orElse(List.of());
-        } else if (email != null) {
-            return userRepository.findByEmail(email).map(List::of).orElse(List.of());
-        } else {
-            return userRepository.findAll();
-        }
+    public Optional<User> findById(String id) {
+        return userRepository.findById(id);
     }
 
 }

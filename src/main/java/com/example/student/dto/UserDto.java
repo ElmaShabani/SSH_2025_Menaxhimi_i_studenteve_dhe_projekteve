@@ -1,5 +1,6 @@
 package com.example.student.dto;
 
+import com.example.student.domain.Role;
 import lombok.*;
 
 
@@ -13,6 +14,7 @@ public class UserDto {
     private String fullname;
     private String email;
     private String password;
+    private Role role;
 
     public String getFullname() {
         return fullname;
@@ -37,6 +39,15 @@ public class UserDto {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
 }
+
 
 

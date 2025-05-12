@@ -1,14 +1,19 @@
 package com.example.student.controller;
 
+import com.example.student.domain.Role;
 import com.example.student.domain.User;
+import com.example.student.dto.PasswordChangeDto;
 import com.example.student.dto.UserDto;
 import com.example.student.service.UserService;
 import lombok.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -16,66 +21,39 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
+    private final UserService userService;
 
-    private UserService userService;
+    @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
+    @PatchMapping("/{id}/change-password")
+    public ResponseEntity<?> changePassword(@PathVariable String id,
+                                            @RequestBody PasswordChangeDto passwordChangeDto,
+                                            Principal principal) {
+        User currentUser = userService.findByEmail(principal.getName()).orElse(null);
+        if (currentUser == null || (!currentUser.getId().equals(id) && currentUser.getRole() != Role.ADMIN)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to change this password.");
+        }
 
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody UserDto user) {
-        User createdUser = userService.createUser(user);
-        return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).body(createdUser);
+        boolean changed = userService.changePassword(id, passwordChangeDto);
+        if (changed) {
+            return ResponseEntity.ok("Password changed successfully.");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Old password is incorrect.");
+        }
     }
-
     @GetMapping
-    public ResponseEntity<Page<User>> getUser(@RequestParam(value = "page", defaultValue = "0") int page,
-                                              @RequestParam(value = "size", defaultValue = "10") int size) {
-        Page<User> users = userService.getAllUsers(page, size);
-        return ResponseEntity.ok().body(users);
+    public ResponseEntity<List<User>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable String id) {
-        User user = userService.getUserById(id);
-        if (user != null) {
-            return ResponseEntity.ok().body(user);
-        }
-        return ResponseEntity.notFound().build();
-    }
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String>deleteUser(@PathVariable String id){
-        boolean deleted=userService.deleteUser(id);
-        if(deleted){
-            return ResponseEntity.ok("User with id"+id+"is deleted successfully");
-        }
-        else{
-            return  ResponseEntity.notFound().build();
-        }
-    }
-    @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable String id, @RequestBody User updateUser) {
-        User user = userService.updateUser(id, updateUser);
-        if (user != null) {
-            return ResponseEntity.ok(user);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @GetMapping("/filter")
-    public ResponseEntity<List<User>> filterUser(
-            @RequestParam(value = "id", required = false) String id,
-            @RequestParam(value = "email", required = false) String email) {
-
-        List<User> user = userService.filterUser(id, email);
-
-        if (!user.isEmpty()) {
-            return ResponseEntity.ok(user);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<?> getUserById(@PathVariable String id) {
+        return userService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }
 

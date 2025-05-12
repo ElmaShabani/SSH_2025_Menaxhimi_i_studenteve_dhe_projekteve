@@ -16,10 +16,10 @@ public class User {
     private String id;
     private String fullname;
     private String email;
-    @JsonProperty("is_admin")
-    @Column(name = "is_admin")
-    private Boolean isAdmin;
-    private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     private String passwordHash;
 
     public String getId() {
@@ -46,20 +46,12 @@ public class User {
         this.email = email;
     }
 
-    public Boolean getAdmin() {
-        return isAdmin;
+    public Role getRole() {
+        return role;
     }
 
-    public void setAdmin(Boolean admin) {
-        isAdmin = admin;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public String getPasswordHash() {
