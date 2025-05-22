@@ -2,7 +2,9 @@ package com.example.student.controller;
 
 import com.example.student.domain.Semester;
 import com.example.student.domain.SemesterStatus;
+import com.example.student.dto.StudentSemesterDto;
 import com.example.student.service.StudentSemesterService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,4 +25,12 @@ public class StudentSemesterController {
             @PathVariable SemesterStatus status) {
         return service.getSemestersByStatus(studentId, status);
     }
+
+    @PostMapping("/register")
+    public ResponseEntity<Void> register(@RequestBody StudentSemesterDto dto) {
+        service.registerStudentToSemester(dto);
+        return ResponseEntity.ok().build();
+    }
+
+
 }

@@ -9,7 +9,7 @@ public class ExamDto {
     private String title;
     private LocalDate date;
     private Integer maxPoints;
-    private Long subjectId;  // Change to Long
+    private String subjectId;
     private List<String> studentIds;
     private Long semesterId;  // ID e semestrit (already Long)
 
@@ -47,11 +47,11 @@ public class ExamDto {
         this.maxPoints = maxPoints;
     }
 
-    public Long getSubjectId() {
+    public String getSubjectId() {
         return subjectId;
     }
 
-    public void setSubjectId(Long subjectId) {  // Change setter to Long
+    public void setSubjectId(String subjectId) {  // Change setter to Long
         this.subjectId = subjectId;
     }
 

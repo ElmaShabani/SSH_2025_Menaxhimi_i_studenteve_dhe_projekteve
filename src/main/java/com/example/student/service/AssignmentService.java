@@ -24,7 +24,7 @@ public class AssignmentService {
     private final SubjectRepository subjectRepository;
 
     public AssignmentDto addAssignment(AssignmentDto dto) {
-        Subject subject = subjectRepository.findById(Long.valueOf(dto.getSubjectId()))
+        Subject subject = subjectRepository.findById(dto.getSubjectId())
                 .orElseThrow(() -> new RuntimeException("Subject not found"));
 
         Assignment assignment = new Assignment();

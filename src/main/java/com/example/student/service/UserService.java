@@ -41,13 +41,23 @@ public class UserService {
 
     public User createUser(UserDto userDTO) {
         User user = new User();
-        user.setId(UUID.randomUUID().toString());
+        String userId = UUID.randomUUID().toString();
+        user.setId(userId);
         user.setFullname(userDTO.getFullname());
         user.setEmail(userDTO.getEmail());
-        user.setRole(userDTO.getRole() != null ? userDTO.getRole() : Role.STUDENT);
-        user.setPasswordHash(passwordEncoder.encode(userDTO.getPassword()));
+
+        Role role = userDTO.getRole() != null ? userDTO.getRole() : Role.STUDENT;
+        user.setRole(role);
+
+        if (role == Role.ADMIN) {
+            user.setPasswordHash(passwordEncoder.encode(userDTO.getPassword()));
+        } else {
+            user.setPasswordHash(passwordEncoder.encode(userId));
+        }
+
         return userRepository.save(user);
     }
+
 
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);

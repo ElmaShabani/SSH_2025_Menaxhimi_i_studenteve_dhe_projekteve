@@ -38,9 +38,6 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 public class ContactService {
     @Autowired
     private final ContactRepo contactRepo;
-    @Autowired
-    private ContactService contactService;
-
     public ContactService(ContactRepo contactRepo){
         this.contactRepo=contactRepo;
     }

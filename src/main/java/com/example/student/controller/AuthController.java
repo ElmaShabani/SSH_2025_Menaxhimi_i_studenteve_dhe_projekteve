@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,14 +38,21 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserDto dto) {
+    public ResponseEntity<?> login(@RequestBody UserDto dto) {
         Optional<User> userOpt = userService.findByEmail(dto.getEmail());
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             if (userService.getPasswordEncoder().matches(dto.getPassword(), user.getPasswordHash())) {
-                return ResponseEntity.ok("Login successful!");
+                Map<String, String> response = new HashMap<>();
+                response.put("message", "Login successful!");
+                response.put("role", user.getRole().name());
+                response.put("name", user.getFullname());
+                return ResponseEntity.ok(response); // ✅ tani kthen Map
             }
         }
-        return ResponseEntity.status(401).body("Invalid credentials");
+        // error për login të pasaktë
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "Invalid credentials");
+        return ResponseEntity.status(401).body(error);
     }
 }

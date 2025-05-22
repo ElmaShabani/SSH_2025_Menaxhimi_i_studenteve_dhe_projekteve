@@ -35,13 +35,18 @@ public class ResourceService {
         resource.setTitle(dto.getTitle());
         resource.setDescription(dto.getDescription());
 
-        // Konvertimi i ID-ve sipas nevojës
-        Subject subject = subjectRepository.findById(Long.parseLong(dto.getSubjectId())).orElseThrow();
-        Professor professor = professorRepository.findById(UUID.fromString(dto.getProfessorId())).orElseThrow();
-        StudentSemester studentSemester = semesterRepository.findById(Long.parseLong(dto.getSemesterId())).orElseThrow();
+        Subject subject = subjectRepository.findById(dto.getSubjectId())
+                .orElseThrow(() -> new RuntimeException("Subject not found with ID: " + dto.getSubjectId()));
+
+        Professor professor = professorRepository.findById(UUID.fromString(dto.getProfessorId()))
+                .orElseThrow(() -> new RuntimeException("Professor not found with ID: " + dto.getProfessorId()));
+
+        StudentSemester studentSemester = semesterRepository.findById(Long.parseLong(dto.getSemesterId()))
+                .orElseThrow(() -> new RuntimeException("Semester not found with ID: " + dto.getSemesterId()));
         Semester semester = studentSemester.getSemester();
-        resource.setSemester(semester);
-        FileUpload fileUpload = fileUploadRepository.findById(Long.parseLong(dto.getFileUploadId())).orElseThrow();
+
+        FileUpload fileUpload = fileUploadRepository.findById(Long.parseLong(dto.getFileUploadId()))
+                .orElseThrow(() -> new RuntimeException("File not found with ID: " + dto.getFileUploadId()));
 
         resource.setSubject(subject);
         resource.setProfessor(professor);
@@ -52,6 +57,7 @@ public class ResourceService {
         Resource saved = resourceRepository.save(resource);
         return mapToResponse(saved);
     }
+
     private ResourceResponseDTO mapToResponseDto(Resource resource) {
         ResourceResponseDTO dto = new ResourceResponseDTO();
         dto.setId(resource.getId());
@@ -85,7 +91,7 @@ public class ResourceService {
         resource.setTitle(dto.getTitle());
         resource.setDescription(dto.getDescription());
 
-        resource.setSubject(subjectRepository.findById(Long.parseLong(dto.getSubjectId())).orElseThrow());
+        resource.setSubject(subjectRepository.findById(dto.getSubjectId()).orElseThrow());
         resource.setProfessor(professorRepository.findById(UUID.fromString(dto.getProfessorId())).orElseThrow());
 
         StudentSemester studentSemester = semesterRepository.findById(Long.parseLong(dto.getSemesterId())).orElseThrow();

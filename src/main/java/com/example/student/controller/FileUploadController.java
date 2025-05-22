@@ -10,6 +10,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,7 +31,7 @@ public class FileUploadController {
 
     @Autowired
     private UserRepo userRepository;
-
+    @PreAuthorize("hasRole('PROFESSOR')")
     @PostMapping("/upload")
     public ResponseEntity<FileUpload> uploadFile(@RequestParam("file") MultipartFile file, Principal principal) throws IOException {
         User currentUser = userRepository.findByEmail(principal.getName()).orElseThrow();
