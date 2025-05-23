@@ -4,6 +4,7 @@ import com.example.student.domain.Role;
 import com.example.student.domain.User;
 import com.example.student.dto.ProfessorDto;
 import com.example.student.repo.ProfessorRepo;
+import com.example.student.repo.RoleRepo;
 import com.example.student.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,10 +20,12 @@ public class ProfessorService {
     private final ProfessorRepo professorRepository;
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
-    public ProfessorService(ProfessorRepo professorRepository, UserRepo userRepo,PasswordEncoder passwordEncoder) {
+    private final RoleRepo roleRepo;
+    public ProfessorService(ProfessorRepo professorRepository, UserRepo userRepo,PasswordEncoder passwordEncoder,RoleRepo roleRepo) {
         this.professorRepository = professorRepository;
         this.userRepo = userRepo;
         this.passwordEncoder=passwordEncoder;
+        this.roleRepo=roleRepo;
     }
 
     public List<Professor> getAllProfessors() {
@@ -42,7 +45,9 @@ public class ProfessorService {
         user.setId(savedProf.getId().toString());
         user.setEmail(savedProf.getEmail());
         user.setFullname(savedProf.getName());
-        user.setRole(Role.PROFESSOR);
+        Role studentRole = roleRepo.findByName("PROFESSOR")
+                .orElseThrow(() -> new RuntimeException("Roli PROFESSOR nuk ekziston"));
+        user.setRole(studentRole);
         user.setPasswordHash(passwordEncoder.encode(savedProf.getId().toString()));
         userRepo.save(user);
 

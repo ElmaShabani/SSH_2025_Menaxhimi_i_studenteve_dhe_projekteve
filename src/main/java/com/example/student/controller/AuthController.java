@@ -45,7 +45,7 @@ public class AuthController {
             if (userService.getPasswordEncoder().matches(dto.getPassword(), user.getPasswordHash())) {
                 Map<String, String> response = new HashMap<>();
                 response.put("message", "Login successful!");
-                response.put("role", user.getRole().name());
+                response.put("role", user.getRole().getName());
                 response.put("name", user.getFullname());
                 response.put("id", user.getId());
                 return ResponseEntity.ok(response); // ✅ tani kthen Map

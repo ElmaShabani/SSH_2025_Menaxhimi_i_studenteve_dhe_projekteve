@@ -5,3 +5,11 @@ CREATE TABLE userinfo (
   role ENUM('ADMIN', 'PROFESSOR', 'STUDENT') DEFAULT 'STUDENT',
   password_hash VARCHAR(255) NOT NULL
 );
+ALTER TABLE userinfo
+DROP COLUMN role;
+
+ALTER TABLE userinfo
+ADD COLUMN role_id INT;
+
+ALTER TABLE userinfo
+ADD CONSTRAINT fk_user_role FOREIGN KEY (role_id) REFERENCES role(id);

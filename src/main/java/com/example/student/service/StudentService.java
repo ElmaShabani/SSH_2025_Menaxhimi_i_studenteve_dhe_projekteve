@@ -3,6 +3,7 @@ package com.example.student.service;
 import com.example.student.domain.Role;
 import com.example.student.domain.Student;
 import com.example.student.domain.User;
+import com.example.student.repo.RoleRepo;
 import com.example.student.repo.StudentRepo;
 import com.example.student.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +24,15 @@ public class StudentService {
     private final StudentRepo studentRepo;
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
+    private final RoleRepo roleRepo;
+
 
     @Autowired
-    public StudentService(StudentRepo studentRepo, UserRepo userRepo, PasswordEncoder passwordEncoder) {
+    public StudentService(StudentRepo studentRepo, UserRepo userRepo, PasswordEncoder passwordEncoder,RoleRepo roleRepo) {
         this.studentRepo = studentRepo;
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
+        this.roleRepo=roleRepo;
     }
 
     public Student createStudent(Student student) {
@@ -38,12 +42,17 @@ public class StudentService {
         user.setId(savedStudent.getId());
         user.setEmail(savedStudent.getEmail());
         user.setFullname(savedStudent.getFullname());
-        user.setRole(Role.STUDENT);
+
+        Role studentRole = roleRepo.findByName("STUDENT")
+                .orElseThrow(() -> new RuntimeException("Roli STUDENT nuk ekziston"));
+        user.setRole(studentRole);
+
         user.setPasswordHash(passwordEncoder.encode(savedStudent.getId()));
         userRepo.save(user);
 
         return savedStudent;
     }
+
 
     @GetMapping
     public Page<Student> getAllStudents(int page, int size) {

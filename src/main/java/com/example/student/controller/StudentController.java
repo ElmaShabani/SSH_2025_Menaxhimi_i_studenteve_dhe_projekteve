@@ -4,6 +4,7 @@ import com.example.student.domain.Student;
 import com.example.student.service.StudentService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -21,6 +22,7 @@ public class StudentController {
     }
 
     @PostMapping
+    @PreAuthorize("@userService.hasPermission(authentication.name, 'POST', '/students')")
     public ResponseEntity<Student> createStudent(@RequestBody Student student) {
         Student createdStudent = studentService.createStudent(student);
         return ResponseEntity.created(URI.create("/students/" + createdStudent.getId())).body(createdStudent);
@@ -42,6 +44,7 @@ public class StudentController {
         return ResponseEntity.notFound().build();
     }
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String>deleteStudent(@PathVariable String id){
         boolean deleted=studentService.deleteStudent(id);
         if(deleted){

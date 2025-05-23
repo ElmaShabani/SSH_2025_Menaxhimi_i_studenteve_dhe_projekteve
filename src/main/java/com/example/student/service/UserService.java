@@ -4,25 +4,19 @@ import com.example.student.domain.Role;
 import com.example.student.domain.User;
 import com.example.student.dto.PasswordChangeDto;
 import com.example.student.dto.UserDto;
+import com.example.student.repo.RoleRepo;
 import com.example.student.repo.UserRepo;
 import lombok.Data;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 
 @Service
 @Data
@@ -31,11 +25,13 @@ import java.util.UUID;
 @RequestMapping("/users")
 public class UserService {
     private final UserRepo userRepository;
+    private final RoleRepo roleRepo;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepo userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepo userRepository, RoleRepo roleRepo, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.roleRepo = roleRepo;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -46,10 +42,13 @@ public class UserService {
         user.setFullname(userDTO.getFullname());
         user.setEmail(userDTO.getEmail());
 
-        Role role = userDTO.getRole() != null ? userDTO.getRole() : Role.STUDENT;
+        String roleName = userDTO.getRole().getName();
+        Role role = roleRepo.findByName(roleName)
+                .orElseThrow(() -> new RuntimeException("Roli " + roleName + " nuk ekziston në databazë"));
+
         user.setRole(role);
 
-        if (role == Role.ADMIN) {
+        if ("ADMIN".equalsIgnoreCase(role.getName())) {
             user.setPasswordHash(passwordEncoder.encode(userDTO.getPassword()));
         } else {
             user.setPasswordHash(passwordEncoder.encode(userId));
@@ -57,7 +56,6 @@ public class UserService {
 
         return userRepository.save(user);
     }
-
 
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
@@ -79,6 +77,7 @@ public class UserService {
     public PasswordEncoder getPasswordEncoder() {
         return passwordEncoder;
     }
+
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -87,4 +86,16 @@ public class UserService {
         return userRepository.findById(id);
     }
 
+    public boolean hasPermission(String email, String verb, String resource) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) return false;
+
+        User user = userOpt.get();
+        Role role = user.getRole();
+        if (role == null || role.getPermissions() == null) return false;
+
+        return role.getPermissions().stream()
+                .anyMatch(p -> p.getVerb().equalsIgnoreCase(verb)
+                        && p.getResource().equalsIgnoreCase(resource));
+    }
 }

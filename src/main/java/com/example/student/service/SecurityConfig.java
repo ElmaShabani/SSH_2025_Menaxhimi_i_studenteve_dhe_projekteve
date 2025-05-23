@@ -51,11 +51,8 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults()) // ⬅⬅⬅ SHTO KËTË RRESHT
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/students/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/students").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/professors/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/professors").permitAll()
                         .requestMatchers(HttpMethod.GET, "/subjects/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/subjects").permitAll()
 
                         .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/students/**").hasAnyRole("STUDENT", "ADMIN", "PROFESSOR")

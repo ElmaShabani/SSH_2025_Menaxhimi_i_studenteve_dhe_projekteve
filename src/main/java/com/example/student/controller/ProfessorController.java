@@ -4,6 +4,7 @@ import com.example.student.dto.ProfessorDto;
 import com.example.student.service.ProfessorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class ProfessorController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Professor> create(@RequestBody ProfessorDto dto) {
         return ResponseEntity.ok(professorService.createProfessor(dto));
     }
@@ -36,6 +38,7 @@ public class ProfessorController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         professorService.deleteProfessor(id);
         return ResponseEntity.noContent().build();

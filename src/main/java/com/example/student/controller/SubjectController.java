@@ -4,6 +4,7 @@ import com.example.student.dto.SubjectDto;
 import com.example.student.service.SubjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class SubjectController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SubjectDto> addSubject(@RequestBody SubjectDto subjectDTO) {
         return ResponseEntity.ok(subjectService.addSubject(subjectDTO));
     }

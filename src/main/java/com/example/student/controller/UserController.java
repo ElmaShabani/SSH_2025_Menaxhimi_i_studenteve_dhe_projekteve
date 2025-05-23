@@ -33,7 +33,8 @@ public class UserController {
                                             @RequestBody PasswordChangeDto passwordChangeDto,
                                             Principal principal) {
         User currentUser = userService.findByEmail(principal.getName()).orElse(null);
-        if (currentUser == null || (!currentUser.getId().equals(id) && currentUser.getRole() != Role.ADMIN)) {
+        if (currentUser == null || (!currentUser.getId().equals(id) &&
+                !currentUser.getRole().getName().equalsIgnoreCase("ADMIN"))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to change this password.");
         }
 
@@ -44,6 +45,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Old password is incorrect.");
         }
     }
+
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());

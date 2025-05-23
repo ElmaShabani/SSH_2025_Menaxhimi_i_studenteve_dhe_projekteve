@@ -17,7 +17,8 @@ public class User {
     private String fullname;
     private String email;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
+    @JoinColumn(name = "role_id")
     private Role role;
 
     private String passwordHash;
