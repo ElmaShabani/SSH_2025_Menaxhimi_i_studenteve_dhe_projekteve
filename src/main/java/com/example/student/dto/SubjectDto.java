@@ -1,5 +1,6 @@
 package com.example.student.dto;
 
+import com.example.student.domain.Professor;
 import lombok.*;
 
 @Getter
@@ -11,11 +12,14 @@ public class SubjectDto {
         private String name;
         private String department;
         private Integer credits;
-        public SubjectDto(String id,String name, String department, Integer credits) {
+        private String professorId;
+
+        public SubjectDto(String id, String name, String department, Integer credits, String professorId) {
                 this.id=id;
                 this.name = name;
                 this.department = department;
                 this.credits = credits;
+                this.professorId=professorId;
         }
 
         public String getId() {
@@ -48,5 +52,13 @@ public class SubjectDto {
 
         public void setCredits(Integer credits) {
                 this.credits = credits;
+        }
+
+        public String getProfessorId() {
+                return professorId;
+        }
+
+        public void setProfessorId(String professorId) {
+                this.professorId = professorId;
         }
 }

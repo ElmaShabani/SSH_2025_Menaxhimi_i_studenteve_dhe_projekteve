@@ -4,3 +4,4 @@ CREATE TABLE subjects (
     department VARCHAR(255),
     credits INT
 );
+ALTER TABLE subjects ADD COLUMN professor_id VARCHAR(255);

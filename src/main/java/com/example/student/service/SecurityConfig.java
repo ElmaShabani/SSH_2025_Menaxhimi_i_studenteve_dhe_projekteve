@@ -48,8 +48,17 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults()) // ⬅⬅⬅ SHTO KËTË RRESHT
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET, "/students/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/students").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/professors/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/professors").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/subjects/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/subjects").permitAll()
+
                         .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/students/**").hasAnyRole("STUDENT", "ADMIN", "PROFESSOR")
                         .requestMatchers(HttpMethod.POST, "/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/users/**").hasAnyRole("ADMIN", "PROFESSOR")
                         .requestMatchers(HttpMethod.PUT, "/users/**").hasAnyRole("ADMIN", "STUDENT", "PROFESSOR")
@@ -58,6 +67,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());
+
 
         return http.build();
     }

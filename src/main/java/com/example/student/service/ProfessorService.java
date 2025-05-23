@@ -32,7 +32,6 @@ public class ProfessorService {
     public Professor createProfessor(ProfessorDto dto) {
         Professor professor = new Professor();
         UUID profId = UUID.randomUUID();
-        professor.setId(profId);
         professor.setName(dto.getName());
         professor.setEmail(dto.getEmail());
         professor.setTitle(dto.getTitle());

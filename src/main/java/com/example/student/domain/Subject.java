@@ -1,9 +1,7 @@
 package com.example.student.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -22,6 +20,10 @@ public class Subject {
     private String name;
     private String department;
     private Integer credits;
+    @ManyToOne
+    @JoinColumn(name = "professor_id")
+    private Professor professorId;
+
 
     public String getId() {
         return id;
@@ -53,5 +55,13 @@ public class Subject {
 
     public void setCredits(Integer credits) {
         this.credits = credits;
+    }
+
+    public Professor getProfessorId() {
+        return professorId;
+    }
+
+    public void setProfessorId(Professor professorId) {
+        this.professorId = professorId;
     }
 }

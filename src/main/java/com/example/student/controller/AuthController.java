@@ -47,6 +47,7 @@ public class AuthController {
                 response.put("message", "Login successful!");
                 response.put("role", user.getRole().name());
                 response.put("name", user.getFullname());
+                response.put("id", user.getId());
                 return ResponseEntity.ok(response); // ✅ tani kthen Map
             }
         }
