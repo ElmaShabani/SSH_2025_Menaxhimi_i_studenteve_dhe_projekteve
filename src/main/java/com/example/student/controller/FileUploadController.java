@@ -35,8 +35,8 @@ public class FileUploadController {
     @PostMapping("/upload")
     public ResponseEntity<FileUpload> uploadFile(@RequestParam("file") MultipartFile file, Principal principal) throws IOException {
         User currentUser = userRepository.findByEmail(principal.getName()).orElseThrow();
-        if (!"PROFESSOR".equals(currentUser.getRole())) {
-            throw new AccessDeniedException("Vetëm profesorët mund të ngarkojnë skedarë.");
+        if (!"PROFESSOR".equals(currentUser.getRole().getName())) {
+            throw new AccessDeniedException("Vetëm profesorët mund të fshijnë skedarë.");
         }
 
         String fileUrl = fileStorageService.storeFile(file);
@@ -63,7 +63,7 @@ public class FileUploadController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFile(@PathVariable Long id, Principal principal) throws IOException {
         User currentUser = userRepository.findByEmail(principal.getName()).orElseThrow();
-        if (!"PROFESSOR".equals(currentUser.getRole())) {
+        if (!"PROFESSOR".equals(currentUser.getRole().getName())) {
             throw new AccessDeniedException("Vetëm profesorët mund të fshijnë skedarë.");
         }
 
